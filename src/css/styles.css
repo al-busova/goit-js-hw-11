@@ -11,3 +11,11 @@ body {
   color: #212121;
   line-height: 1.5;
 }
+.gallery {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+.photo-card {
+  flex-basis: calc((100% - 90px) / 4);
+}
