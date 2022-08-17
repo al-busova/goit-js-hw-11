@@ -81,7 +81,10 @@ async function insertContent(photos) {
   if (elemCount === pisabayApiServise.totalHits) {
     refs.loadMoreBtn.classList.add('is-hidden');
     Notiflix.Notify.info(
-      "We're sorry, but you've reached the end of search results."
+      "We're sorry, but you've reached the end of search results.",
+  {
+    timeout: 10000,
+  },
     );
   }
 }
