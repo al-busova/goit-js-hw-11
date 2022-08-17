@@ -13,7 +13,7 @@ export default class PisabayApiServise{
         const response = await axios.get(url);
         // const data = await response.json(); //після axios це прибирається
         this.page += 1;
-        this.totalHits = response.totalHits;
+        this.totalHits = response.data.totalHits;
         return response.data;
         // логіка через звичайні проміси
         // return fetch(url)
@@ -38,5 +38,4 @@ export default class PisabayApiServise{
     set query(newQuery) {
        this.searchQuery = newQuery;
     }
-
 }

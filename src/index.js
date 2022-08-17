@@ -64,13 +64,13 @@ function searchPhoto(e) {
     }
   };
   insertCollection();
- 
 }
 
 function loadMorePhoto() {
   pisabayApiServise.fetchPhoto().then(photos => insertContent(photos.hits));
 }
-function insertContent(photos) {
+
+async function insertContent(photos) {
   refs.boxForGallery.insertAdjacentHTML(
     'beforeend',
     createCardWithPhoto(photos)
@@ -95,16 +95,16 @@ function createCardWithPhoto(photos) {
 </a>
   <div class="info">
     <p class="info-item">
-      <b>Likes <span>${photo.likes}</span></b>
+      <b>Likes </b><b><span>${photo.likes}</span></b>
     </p>
     <p class="info-item">
-      <b>Views <span>${photo.views}</span></b>
+      <b>Views </b><b><span>${photo.views}</span></b>
     </p>
     <p class="info-item">
-      <b>Comments <span>${photo.comments}</span></b>
+      <b>Comments </b><b><span>${photo.comments}</span></b>
     </p>
     <p class="info-item">
-      <b>Downloads <span>${photo.downloads}</span></b>
+      <b>Downloads </b><b><span>${photo.downloads}</span></b>
     </p>
   </div>
 </div> `
