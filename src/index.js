@@ -1,13 +1,14 @@
 import './css/styles.css';
 import Notiflix from 'notiflix';
 import PisabayApiServise from './pixabay-servise';
+import throttle from 'lodash.throttle';
 import SimpleLightbox from "simplelightbox";
 import "simplelightbox/dist/simple-lightbox.min.css";
 
 const refs = {
   formEl: document.querySelector('#search-form'),
   boxForGallery: document.querySelector('.gallery'),
-  loadMoreBtn: document.querySelector('.load-more'),
+  // loadMoreBtn: document.querySelector('.load-more'),
 };
 
 const pisabayApiServise = new PisabayApiServise();
@@ -16,9 +17,13 @@ const lightBoxGallery = new SimpleLightbox('.gallery a', {
   captionDelay: 250,
   captionPosition: "bottom",
 });
-
+let shouldLoad = true;
 refs.formEl.addEventListener('submit', searchPhoto);
-refs.loadMoreBtn.addEventListener('click', loadMorePhoto);
+// refs.loadMoreBtn.addEventListener('click', loadMorePhoto);
+(() => {
+  window.addEventListener('scroll', throttle(checkPosition, 500) )
+  window.addEventListener('resize', throttle(checkPosition, 500) )
+})();
 
 function searchPhoto(e) {
   e.preventDefault();
@@ -30,9 +35,8 @@ function searchPhoto(e) {
     Notiflix.Notify.info('Please enter something.');
     return;
   }
-
   pisabayApiServise.resetPage();
-  refs.loadMoreBtn.classList.add('is-hidden');
+  // refs.loadMoreBtn.classList.add('is-hidden');
   //      логіка через звичайні проміси
   // pisabayApiServise.fetchPhoto()
   //       .then((photos) => {
@@ -55,22 +59,22 @@ function searchPhoto(e) {
         return;
       }
       Notiflix.Notify.success(`Hooray! We found ${photos.totalHits} images.`);
-      refs.loadMoreBtn.classList.remove('is-hidden');
+      // refs.loadMoreBtn.classList.remove('is-hidden');
       insertContent(photos.hits);
     } catch (error) {
       Notiflix.Notify.failure(error.message);
-
-      console.log(error);
     }
   };
+
   insertCollection();
 }
 
-function loadMorePhoto() {
-  pisabayApiServise.fetchPhoto().then(photos => insertContent(photos.hits));
-}
+// function loadMorePhoto() {
+//   pisabayApiServise.fetchPhoto().then(photos => insertContent(photos.hits));
+// }
 
 async function insertContent(photos) {
+ 
   refs.boxForGallery.insertAdjacentHTML(
     'beforeend',
     createCardWithPhoto(photos)
@@ -79,13 +83,15 @@ async function insertContent(photos) {
   const elemCount =
     document.getElementsByClassName('gallery')[0].childElementCount;
   if (elemCount === pisabayApiServise.totalHits) {
-    refs.loadMoreBtn.classList.add('is-hidden');
+    // refs.loadMoreBtn.classList.add('is-hidden');
+    
     Notiflix.Notify.info(
       "We're sorry, but you've reached the end of search results.",
   {
     timeout: 10000,
   },
     );
+    shouldLoad = false;
   }
 }
 
@@ -116,4 +122,17 @@ function createCardWithPhoto(photos) {
 }
 function clearContent() {
   refs.boxForGallery.innerHTML = '';
+}
+async function checkPosition() {
+  const height = document.body.offsetHeight
+  const screenHeight = window.innerHeight;
+  const scrolled = window.scrollY;
+  const threshold = height - screenHeight / 4;
+  const position = scrolled + screenHeight;
+  if (position >= threshold) {
+     if (!shouldLoad) {
+    return;
+  } 
+    await pisabayApiServise.fetchPhoto().then(photos => insertContent(photos.hits));
+  }
 }
